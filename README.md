@@ -34,5 +34,8 @@
 
 ## 리포지토리 구조
 
+- [`.devcontainer`](./.devcontainer): 워크샵을 위한 개발 환경을 설정합니다.
+  - [GitHub Codespaces](https://github.com/features/codespaces) 또는 [Visual Studio Code Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)를 사용할 때 필요합니다.
+  - 더 자세한 내용은 [DevContainers](https://containers.dev)를 참조하세요.
 - [`docs`](./docs): 워크샵 진행에 필요한 문서를 저장합니다.
 - [`save-points`](./save-points): 워크샵 진행 중 중간 결과물을 저장합니다.
