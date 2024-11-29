@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;SKEXP0010;SKEXP0001;SKEXP0050</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;SKEXP0010;SKEXP0001;SKEXP0050</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Markdig" Version="0.37.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.17.1" />
+	<PackageReference Include="Markdig" Version="0.35.0" />
+	<PackageReference Include="Microsoft.SemanticKernel.Plugins.Memory" Version="1.9.0-alpha" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\HikingMate\HikingMate.csproj" />
+    <ProjectReference Include="..\HikingMate.WebApp.Client\HikingMate.WebApp.Client.csproj" />
+  </ItemGroup>
+
+</Project>
