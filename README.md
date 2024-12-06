@@ -1,6 +1,6 @@
 # Semantic Kernel과 Blazor로 만드는 나만의 AI 앱
 
-OpenAI와 같은 LLM을 여러분의 코드나 서비스에 적용한다면, 단순히 ChatGPT와 같은 형태로 사용하는 데 그치지 않을 것입니다. 여러분의 데이터와 로직을 연결해야 비로소 여러분만의 AI 에이전트를 만들 수 있는데요, 이를 가능하게 하는 도구가 바로 Semantic Kernel입니다. 이번 워크숍에서는 Semantic Kernel을 활용해 RAG(Retrieval-Augmented Generation)나 함수호출과 같은 개념을 통해 여러분의 데이터와 로직을 결합하여 고유하고 똑똑한 AI 에이전을 만드는 방법을 다뤄볼 예정입니다.
+OpenAI와 같은 LLM을 여러분의 코드나 서비스에 적용한다면, 단순히 ChatGPT와 같은 형태로 사용하는 데 그치지 않을 것입니다. 여러분의 데이터와 로직을 연결해야 비로소 여러분만의 AI 에이전트를 만들 수 있는데요, 이를 가능하게 하는 도구가 바로 Semantic Kernel입니다. 이번 워크숍에서는 Semantic Kernel을 활용해 RAG(Retrieval-Augmented Generation)나 함수호출과 같은 개념을 통해 여러분의 데이터와 로직을 결합하여 여러분들만의 고유하고 똑똑한 AI 에이전을 만드는 방법을 다뤄볼 예정입니다.
 
 ## 워크샵 목표
 
@@ -25,7 +25,8 @@ OpenAI와 같은 LLM을 여러분의 코드나 서비스에 적용한다면, 단
 
 |순서|제목|
 |---|---|
-|STEP 01|제목|
+|[STEP 00](./docs/step-00.md)|개발 환경 설정하기|
+|[STEP 01](./docs/step-01.md)|Semantic Kernel 사용해보기|
 
 - 각 단계별 중간 결과물은 [세이브 포인트](./save-points)에서 확인할 수 있습니다.
 
