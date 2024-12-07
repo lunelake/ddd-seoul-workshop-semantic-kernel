@@ -1,0 +1,95 @@
+﻿@page "/"
+@page "/chatroom"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@using OpenAI
+@using Markdig
+@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.SemanticKernel;
+@using Microsoft.SemanticKernel.ChatCompletion;
+@using Microsoft.SemanticKernel.Memory
+@using HikingMate
+@using HikingMate.Models
+@using System.ComponentModel
+@using System.Text
+@using System.Text.Json
+@using System.ClientModel
+@using Microsoft.SemanticKernel.Connectors.OpenAI
+
+<div class="chat-container">
+    <div class="chatwindow-container">
+        <div class="chat-messages" id="chatscrollviewer">
+
+            @if (!messageExist)
+            {
+                <div style="text-align: center; margin-top: 150px; margin-bottom: 80px">
+                    <h1>🏞️Hiking mate</h1>
+                    <p style="margin-top: -10px">Hiking mate와 함께하는 즐거운 하이킹 생활</p>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: left; margin: 20px auto 80px auto; max-width: 700px">
+                    <h3>🏞️Hiking mate</h3>
+                </div>
+
+                @foreach (var item in messages)
+                {
+                    <div class="@item.CSS">
+                        <div class="user">@item.Username</div>
+                        @* <div class="msg">@(@item.Message))</div> *@
+                        <div class="msg">@((MarkupString)@item.MarkdownMessage)</div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="input-container">
+            <textarea class="input-lg" placeholder="무엇을 도와드릴까요?" @bind="@input" @bind:event="oninput"></textarea>
+            <button class="btn send-button">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <div style="width:300px">
+        <div>
+            <button class="btn no-border" @onclick="@(() => TapWishlist())">
+                <h3>위시리스트</h3>
+            </button>
+            <button class="btn no-border" style="margin-left:20px" @onclick="@(() => TapRecord())">
+                <h3>기록</h3>
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    List<ChatMessage> messages = [];
+
+    bool messageExist => messages.Count > 0;
+
+    bool showRecord;
+    Kernel? kernel;
+    ChatHistory? chatHistory;
+    IChatCompletionService chatService;
+    string? input;
+
+    protected async override Task OnInitializedAsync()
+    {
+
+    }
+
+    public async Task TapWishlist()
+    {
+        showRecord = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task TapRecord()
+    {
+        showRecord = true;
+        await InvokeAsync(StateHasChanged);
+    }
+}
+
+
