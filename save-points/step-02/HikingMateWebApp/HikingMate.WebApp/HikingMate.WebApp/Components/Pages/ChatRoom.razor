@@ -15,6 +15,7 @@
 @using System.Text.Json
 @using System.ClientModel
 @using Microsoft.SemanticKernel.Connectors.OpenAI
+@using HikingMate.WebApp
 
 <div class="chat-container">
     <div class="chatwindow-container">
@@ -43,8 +44,8 @@
             }
         </div>
         <div class="input-container">
-            <textarea class="input-lg" placeholder="무엇을 도와드릴까요?"></textarea>
-            <button class="btn send-button">
+            <textarea class="input-lg" @onkeydown="HandleKeyDown" placeholder="무엇을 도와드릴까요?" @bind="@input" @bind:event="oninput"></textarea>
+            <button class="btn send-button" @onclick="@(Send)">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
@@ -71,10 +72,55 @@
     bool recordsExist => records.Count > 0; 
 
     bool showRecord;
+    string? input;
+
+    Kernel? kernel;
+    ChatHistory? chatHistory;
+    IChatCompletionService chatCompletionService;
 
     protected async override Task OnInitializedAsync()
     {
+        await Load();
+    }
 
+    public async Task Load()
+    {
+        await Task.Delay(1);
+        messages.Clear();
+        var modelId = "gpt-4o";
+        var client = GitHubModelsClient.GetClient();
+        kernel = Kernel.CreateBuilder()
+                            .AddOpenAIChatCompletion(modelId, client)
+                            .Build();
+        chatCompletionService = kernel.Services.GetService<IChatCompletionService>();
+        chatHistory = new ChatHistory();
+    }
+
+    private async Task Send()
+    {
+        if (string.IsNullOrEmpty(input) || chatHistory == null || kernel == null)
+            return;
+        var userMessage = new ChatMessage(ChatMessageRole.User, input);
+        messages.Add(userMessage);
+        chatHistory.AddUserMessage(input);
+        input = string.Empty;
+        await InvokeAsync(StateHasChanged);
+        var assistantMessage = new ChatMessage(ChatMessageRole.Assistant);
+        messages.Add(assistantMessage);
+        var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory);
+        await foreach (var text in result)
+        {
+            await Task.Delay(20);
+            assistantMessage.Message += text;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        var isEnterKey = e.Key == "Enter" && !e.ShiftKey;
+        if (isEnterKey)
+            await Send();
     }
 
     public async Task TapWishlist()

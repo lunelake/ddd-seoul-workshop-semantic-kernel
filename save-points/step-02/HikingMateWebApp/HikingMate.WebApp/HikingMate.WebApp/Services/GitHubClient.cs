@@ -5,7 +5,7 @@ public class GitHubModelsClient
 {
     public static OpenAIClient GetClient()
     {
-        var githubPAT = "github-PAT";
+        var githubPAT = "githubPAT";
         var uri = "https://models.inference.ai.azure.com";
         var client = new OpenAIClient(new ApiKeyCredential(githubPAT), new OpenAIClientOptions
         {
