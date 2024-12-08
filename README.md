@@ -27,6 +27,10 @@ OpenAI와 같은 LLM을 여러분의 코드나 서비스에 적용한다면, 단
 |---|---|
 |[STEP 00](./docs/step-00.md)|개발 환경 설정하기|
 |[STEP 01](./docs/step-01.md)|Semantic Kernel 사용해보기|
+|[STEP 02](./docs/step-02.md)|Blazor로 AI 웹 앱 만들어보기|
+|[STEP 03](./docs/step-03.md)|페르소나 설정하기|
+|[STEP 04](./docs/step-04.md)|함수 호출해보기(Function Calling)|
+|[STEP 05](./docs/step-05.md)|메모리 추가해보기|
 
 - 각 단계별 중간 결과물은 [세이브 포인트](./save-points)에서 확인할 수 있습니다.
 
