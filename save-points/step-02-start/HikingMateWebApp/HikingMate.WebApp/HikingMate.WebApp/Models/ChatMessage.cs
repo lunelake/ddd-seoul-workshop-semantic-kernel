@@ -35,25 +35,6 @@ namespace HikingMate.Models
                 }
             }
         }
-
-        #region 4. 마크다운 표시
-
-        public string MarkdownMessage
-        {
-            get
-            {
-                var message = Message;
-                if (!string.IsNullOrEmpty(message))
-                {
-                    var pipeline = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-                    return Markdown.ToHtml(message);
-                }
-
-                return message;
-            }
-        }
-
-        #endregion
     }
 }
 

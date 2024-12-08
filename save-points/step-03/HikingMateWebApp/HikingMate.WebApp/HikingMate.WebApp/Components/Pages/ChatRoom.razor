@@ -38,7 +38,7 @@
                 {
                     <div class="@item.CSS">
                         <div class="user">@item.Username</div>
-                        <div class="msg">@item.Message</div>
+                        <div class="msg">@((MarkupString)@item.MarkdownMessage)</div>
                     </div>
                 }
             }

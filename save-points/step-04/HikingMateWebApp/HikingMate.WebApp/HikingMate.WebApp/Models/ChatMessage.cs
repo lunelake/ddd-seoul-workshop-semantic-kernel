@@ -36,8 +36,6 @@ namespace HikingMate.Models
             }
         }
 
-        #region 4. 마크다운 표시
-
         public string MarkdownMessage
         {
             get
@@ -52,8 +50,6 @@ namespace HikingMate.Models
                 return message;
             }
         }
-
-        #endregion
     }
 }
 

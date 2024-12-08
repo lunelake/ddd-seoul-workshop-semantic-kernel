@@ -137,7 +137,44 @@ private async Task HandleKeyDown(KeyboardEventArgs e)
 <textarea class="input-lg" @onkeydown="HandleKeyDown" placeholder="무엇을 도와드릴까요?" @bind="@input" @bind:event="oninput"></textarea>
 ```
 
-그리고 `dotnet run`을 터미널에 입력해 앱을 실행해보겠습니다. 그리고 `안녕`이라고 입력하고 엔터를 눌러 모델이 정상적으로 응답하는 지 확인합니다.
+그리고 `dotnet run`을 터미널에 입력해 앱을 실행해보겠습니다. `안녕`이라고 입력하고 엔터를 눌러 모델이 정상적으로 응답하는 지 확인합니다.
+그 다음 `서울 트래킹 코스를 추천해줘`라고 입력하고 응답을 살펴봅니다. 응답에 * 문자도 있을 것이고 알아볼 수는 있지만 정리되어 보이지는 않습니다.
+이는 GPT와 같은 일반적인 LLM은 응답을 Markdown 포맷으로 하기 때문입니다. Blazor에서 Markdown을 간단히 표시하는 방법에 대해서 알아보겠습니다.
+
+### Markdown 표시하기
+
+`Models/ChatMessage.cs` 파일을 열어 클래스 안에 아래의 코드를 추가해줍니다. 아래의 코드는 텍스트를 `Markdig`이라는 라이브러리를 사용하여 HTML으로 바꿔줍니다.
+
+```
+public string MarkdownMessage
+{
+    get
+    {
+        var message = Message;
+        if (!string.IsNullOrEmpty(message))
+        {
+            var pipeline = new Markdig.MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            return Markdown.ToHtml(message);
+        }
+
+        return message;
+    }
+}
+```
+
+그리고 다시 `Components/Pages/ChatRoom.razor`로 이동해서 메시지가 표시되는 곳의 코드를 아래와 같이 바꿔줍니다. `MarkupString`은 해당 텍스트가 단순 출력 텍스트가 아니라 Html Markup 텍스트라고 전달해줍니다.
+
+```
+<div class="@item.CSS">
+    <div class="user">@item.Username</div>
+    @* <div class="msg">@(@item.Message))</div> *@
+    <div class="msg">@((MarkupString)@item.MarkdownMessage)</div>
+</div>
+
+```
+
+다시 `dotnet run`을 터미널에 입력해 앱을 실행해보겠습니다.
+`서울 트래킹 코스를 추천해줘`라고 입력하고 응답을 살펴봅니다. 알아보기 쉽게 표시됩니다. 
 
 수고하셨습니다🎉  `Blazor로 AI 웹 앱 만들어보기`를 완료하셨습니다. 이제 [STEP 03: 페르소나 설정하기](./step-03.md) 단계로 넘어가 보세요.
 
