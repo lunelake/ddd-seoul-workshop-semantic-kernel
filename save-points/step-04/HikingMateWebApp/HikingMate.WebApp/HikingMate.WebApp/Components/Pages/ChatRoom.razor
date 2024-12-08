@@ -1,0 +1,186 @@
+﻿@page "/"
+@page "/chatroom"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+@using OpenAI
+@using Markdig
+@using Microsoft.Extensions.DependencyInjection
+@using Microsoft.SemanticKernel;
+@using Microsoft.SemanticKernel.ChatCompletion;
+@using Microsoft.SemanticKernel.Memory
+@using HikingMate
+@using HikingMate.Models
+@using System.ComponentModel
+@using System.Text
+@using System.Text.Json
+@using System.ClientModel
+@using Microsoft.SemanticKernel.Connectors.OpenAI
+@using HikingMate.WebApp
+
+<div class="chat-container">
+    <div class="chatwindow-container">
+        <div class="chat-messages" id="chatscrollviewer">
+
+            @if (!messageExist)
+            {
+                <div style="text-align: center; margin-top: 150px; margin-bottom: 80px">
+                    <h1>🏞️Hiking mate</h1>
+                    <p style="margin-top: -10px">Hiking mate와 함께하는 즐거운 하이킹 생활</p>
+                </div>
+            }
+            else
+            {
+                <div style="text-align: left; margin: 20px auto 80px auto; max-width: 700px">
+                    <h3>🏞️Hiking mate</h3>
+                </div>
+
+                @foreach (var item in messages)
+                {
+                    <div class="@item.CSS">
+                        <div class="user">@item.Username</div>
+                        <div class="msg">@item.Message</div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="input-container">
+            <textarea class="input-lg" @onkeydown="HandleKeyDown" placeholder="무엇을 도와드릴까요?" @bind="@input" @bind:event="oninput"></textarea>
+            <button class="btn send-button" @onclick="@(Send)">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+    <div style="width:300px">
+        <div>
+            <button class="btn no-border" @onclick="@(() => TapWishlist())">
+                <h3>위시리스트</h3>
+            </button>
+            <button class="btn no-border" style="margin-left:20px" @onclick="@(() => TapRecord())">
+                <h3>기록</h3>
+            </button>
+
+            @if (!showRecord)
+            {
+                @if (wishlistExist)
+                {
+                    <div class="wishlist-container">
+                        @foreach (var wishlistItem in wishlistItems)
+                        {
+                            <div class="wishlist-item">
+                                <p><b>@wishlistItem.Title</b></p>
+                                <p>@wishlistItem.Description</p>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        <p>현재는 위시리스트가 없습니다.</p>
+                    </div>
+                }
+            }
+            
+        </div>
+    </div>
+</div>
+
+@code {
+    List<ChatMessage> messages = [];
+    List<HikingTrail> wishlistItems = [];
+    List<HikingRecord> records = [];    
+
+    bool messageExist => messages.Count > 0;
+    bool wishlistExist => wishlistItems.Count > 0;
+    bool recordsExist => records.Count > 0; 
+
+    bool showRecord;
+    string? input;
+
+    Kernel? kernel;
+    ChatHistory? chatHistory;
+    IChatCompletionService chatCompletionService;
+
+    protected async override Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    public async Task Load()
+    {
+        await Task.Delay(1);
+        messages.Clear();
+        var modelId = "gpt-4o";
+        var client = GitHubModelsClient.GetClient();
+        kernel = Kernel.CreateBuilder()
+                            .AddOpenAIChatCompletion(modelId, client)
+                            .Build();
+        chatCompletionService = kernel.Services.GetService<IChatCompletionService>();
+        chatHistory = new ChatHistory();
+
+        var systemMessage =
+            @"Your name is Hiking mate. 
+You are an assistant that helps users discover and manage hiking trails.
+Please speak kindly and use emojis whenever possible.";
+    
+        chatHistory.AddSystemMessage(systemMessage);
+
+        var hikingWishlistService = new HikingMateWishlistService(wishlistItems);
+        hikingWishlistService.NeedUpdateUI += async (s, e) =>
+        {
+            await InvokeAsync(StateHasChanged);
+        };
+
+        var wishlistPlugin = kernel.CreatePluginFromObject(hikingWishlistService);
+        kernel.Plugins.Add(wishlistPlugin);
+    }
+
+    private async Task Send()
+    {
+        if (string.IsNullOrEmpty(input) || chatHistory == null || kernel == null)
+            return;
+
+        var userMessage = new ChatMessage(ChatMessageRole.User, input);
+        messages.Add(userMessage);
+        chatHistory.AddUserMessage(input);
+        input = string.Empty;
+        await InvokeAsync(StateHasChanged);
+
+        var assistantMessage = new ChatMessage(ChatMessageRole.Assistant);
+        messages.Add(assistantMessage);
+
+        OpenAIPromptExecutionSettings openAIPromptExecutionSettings = new()
+        {
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
+        };
+
+        var result = chatCompletionService.GetStreamingChatMessageContentsAsync(chatHistory, executionSettings: openAIPromptExecutionSettings, kernel);
+        await foreach (var text in result)
+        {
+            await Task.Delay(20);
+            assistantMessage.Message += text;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        var isEnterKey = e.Key == "Enter" && !e.ShiftKey;
+        if (isEnterKey)
+            await Send();
+    }
+
+    public async Task TapWishlist()
+    {
+        showRecord = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task TapRecord()
+    {
+        showRecord = true;
+        await InvokeAsync(StateHasChanged);
+    }
+}
+
+
